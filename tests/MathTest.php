@@ -15,7 +15,7 @@ class MathTest extends TestCase
     {
         $this->assertEquals(8, $this->math->addition(5, 3));
         $this->assertEquals(-2, $this->math->addition(-5, 3));
-        $this->assertEquals(0, $this->math->addition(0, 8));
+        $this->assertEquals(0, $this->math->addition(0, 0));
     }
 
     public function testSoustraction(): void
