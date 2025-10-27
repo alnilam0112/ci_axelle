@@ -34,8 +34,8 @@ jobs:
 
        # Corriger les permissions sur PHPUnit 
       - name: Fix PHPUnit permissions
-        run: chmod +x ./vendor/bin/phpunit 
+        run: chmod +x ./vendor/bin/php-cs-fixer 
 
       # Exécuter PHPStan pour analyser le code
       - name: Run tests
-        run : vendor/bin/phpunit
+        run : vendor/bin/php-cs-fixer
