@@ -40,6 +40,5 @@ jobs:
         run: chmod +x ./vendor/bin/phpunit
 
       # Lancer les tests unitaires avec PHPUnit
-      - name: Run PHPUnit
-        run: |
-          ./vendor/bin/phpunit --configuration phpunit.xml --verbose
+      - name: Run tests
+        run: vendor/bin/phpunit
