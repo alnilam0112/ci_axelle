@@ -22,7 +22,7 @@ class MathTest extends TestCase
     {
         $this->assertEquals(2, $this->math->soustraction(5, 3));
         $this->assertEquals(-8, $this->math->soustraction(-5, 3));
-        $this->assertEquals(0, $this->math->soustraction(0, 0));
+        $this->assertEquals(0, $this->math->soustraction(0, 0, +8));
     }
 
     public function testMultiplication(): void
