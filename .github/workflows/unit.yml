@@ -1,0 +1,37 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupérer le code source du dépôt
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # 'uses' ici indique qu'on utilise une action GitHub prête à l'emploi pour cloner le dépôt
+
+      # Installer PHP avec les extensions nécessaires
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo, xml
+        # 'uses' ici installe PHP dans la version souhaitée avec les extensions listées
+
+      # Installer les dépendances PHP via Composer
+      - name: Install dependencies
+        run: |
+          composer install --no-progress --no-interaction
+        # 'run' exécute une commande shell : ici on installe les librairies du projet
+
+      # Lancer les tests unitaires avec PHPUnit
+      - name: Run PHPUnit
+        run: |
+          ./vendor/bin/phpunit --configuration phpunit.xml
+        # 'run' exécute PHPUnit avec le fichier de configuration existant

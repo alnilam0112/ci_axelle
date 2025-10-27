@@ -1,0 +1,39 @@
+## Workflow GitHub Actions pour vérifier le style de code PHP avec PHP CS Fixer
+name: PHP CS Fixer
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+# 'on' définit les événements qui déclenchent le workflow : ici push et pull request sur la branche main
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    # 'runs-on' indique l'environnement d'exécution : ici un serveur Ubuntu
+
+    steps:
+      # Étape 1 : récupérer le code source du dépôt
+      - name: Checkout code
+        uses: actions/checkout@v2
+        # 'uses' ici utilise l'action officielle GitHub pour cloner ton dépôt dans l'environnement d'exécution
+
+      # Étape 2 : installer PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+        # 'uses' installe PHP 8.3 dans l'environnement. Aucune extension spécifique n'est nécessaire pour PHP CS Fixer
+
+      # Étape 3 : installer les dépendances du projet via Composer
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+        # 'run' exécute une commande shell pour installer les dépendances PHP définies dans composer.json
+        # Les options accélèrent l'installation et évitent les suggestions
+
+      # Étape 4 : exécuter PHP CS Fixer pour vérifier le style de code
+      - name: Run PHP CS Fixer
+        run: composer cs-check
+        # 'run' lance le script 'cs-check' défini dans composer.json
+        # Ce script exécute PHP CS Fixer pour détecter les violations du standard PSR-12
