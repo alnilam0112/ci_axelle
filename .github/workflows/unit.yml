@@ -14,24 +14,32 @@ jobs:
       # Récupérer le code source du dépôt
       - name: Checkout code
         uses: actions/checkout@v4
-        # 'uses' ici indique qu'on utilise une action GitHub prête à l'emploi pour cloner le dépôt
 
       # Installer PHP avec les extensions nécessaires
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, intl, pdo, xml
-        # 'uses' ici installe PHP dans la version souhaitée avec les extensions listées
+          extensions: mbstring, intl, pdo, xml, curl, zip
+          coverage: none
+
+      # Vérifier la version de PHP et Composer (utile pour debug)
+      - name: Check PHP version
+        run: php -v
+
+      - name: Check Composer version
+        run: composer -V
 
       # Installer les dépendances PHP via Composer
       - name: Install dependencies
         run: |
-          composer install --no-progress --no-interaction
-        # 'run' exécute une commande shell : ici on installe les librairies du projet
+          composer install --no-progress --no-interaction --prefer-dist
+
+      # Corriger les permissions sur PHPUnit (important !)
+      - name: Fix PHPUnit permissions
+        run: chmod +x ./vendor/bin/phpunit
 
       # Lancer les tests unitaires avec PHPUnit
       - name: Run PHPUnit
         run: |
-          ./vendor/bin/phpunit --configuration phpunit.xml
-        # 'run' exécute PHPUnit avec le fichier de configuration existant
+          ./vendor/bin/phpunit --configuration phpunit.xml --verbose
