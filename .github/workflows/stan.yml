@@ -35,7 +35,7 @@ jobs:
 
 
       # Corriger les permissions sur PHPStan
-      - name: Fix PHPUnit permissions
+      - name: Fix PHPStan permissions
         run: chmod +x ./vendor/bin/phpstan
 
       # Exécuter PHPStan pour analyser le code

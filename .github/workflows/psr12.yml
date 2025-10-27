@@ -33,7 +33,7 @@ jobs:
         # Les options accélèrent l'installation et évitent les suggestions
 
        # Corriger les permissions sur PHPUnit 
-      - name: Fix PHPUnit permissions
+      - name: Fix PHP-cs-fixer permissions
         run: chmod +x ./vendor/bin/php-cs-fixer 
 
       # Exécuter PHPStan pour analyser le code
