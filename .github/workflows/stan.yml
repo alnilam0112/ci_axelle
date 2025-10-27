@@ -33,6 +33,11 @@ jobs:
         # 'run' exécute une commande shell pour installer toutes les bibliothèques définies dans composer.json
         # Les options évitent les suggestions et accélèrent l'installation
 
+
+      # Corriger les permissions sur PHPUnit 
+      - name: Fix PHPUnit permissions
+        run: chmod +x ./vendor/bin/phpunit 
+
       # Étape 4 : exécuter PHPStan pour analyser le code
       - name: Run tests
         run : vendor/bin/phpunit

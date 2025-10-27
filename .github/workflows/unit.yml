@@ -35,7 +35,7 @@ jobs:
         run: |
           composer install --no-progress --no-interaction --prefer-dist
 
-      # Corriger les permissions sur PHPUnit (important !)
+      # Corriger les permissions sur PHPUnit 
       - name: Fix PHPUnit permissions
         run: chmod +x ./vendor/bin/phpunit
 
