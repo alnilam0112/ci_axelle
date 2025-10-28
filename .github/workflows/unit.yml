@@ -41,4 +41,4 @@ jobs:
 
       # Lancer les tests unitaires avec PHPUnit
       - name: Run tests
-        run: vendor/bin/phpunit
+        run: chmod +x vendor/bin/phpunit
