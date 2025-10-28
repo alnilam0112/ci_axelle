@@ -27,11 +27,11 @@ jobs:
       - name: Deploy files via rsync
         run: |
           rsync -avz --delete --exclude='.git' ./ axelle@lesacteursduweb.fr:/var/www/mon_site/
-  deploy:
-    name: Déploiement sur lesacteursduweb.fr
-    runs-on: ubuntu-latest
-    needs: [phpunit, phpstan, phpcsfixer]
-    if: ${{ success() }}
+
+      - name: Déploiement sur lesacteursduweb.fr
+        runs-on: ubuntu-latest
+        needs: [phpunit, phpstan, phpcsfixer]
+        if: ${{ success() }}
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
