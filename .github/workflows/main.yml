@@ -13,16 +13,23 @@ jobs:
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
-      - name: Installation de PHP
+
+      - name: Installer PHP et Composer
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           extensions: mbstring, intl, pdo, pdo_mysql
           tools: composer
-      - name: Installation des dépendances
+
+      - name: Installer les dépendances
         run: composer install --no-progress --no-suggest --no-interaction
-      - name: Lancement des tests PHPUnit
-        run: composer exec phpunit -- --testdox
+
+      - name: Vérifier binaires
+        run: ls -la vendor/bin
+
+      - name: Lancer PHPUnit
+        run: vendor/bin/phpunit --testdox
+
 
   phpstan:
     name: PHPStan
@@ -30,15 +37,22 @@ jobs:
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
-      - name: Installation de PHP
+
+      - name: Installer PHP et Composer
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer
-      - name: Installation des dépendances
+
+      - name: Installer les dépendances
         run: composer install --no-progress --no-suggest --no-interaction
+
+      - name: Vérifier binaires
+        run: ls -la vendor/bin
+
       - name: Analyse PHPStan
-        run: composer exec phpstan -- analyse --no-progress
+        run: vendor/bin/phpstan analyse --no-progress
+
 
   phpcsfixer:
     name: PHP CS Fixer
@@ -46,15 +60,22 @@ jobs:
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
-      - name: Installation de PHP
+
+      - name: Installer PHP et Composer
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer
-      - name: Installation des dépendances
+
+      - name: Installer les dépendances
         run: composer install --no-progress --no-suggest --no-interaction
+
+      - name: Vérifier binaires
+        run: ls -la vendor/bin
+
       - name: Vérification du style de code
-        run: composer exec php-cs-fixer -- fix --dry-run --diff
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
 
   deploy:
     name: Déploiement sur lesacteursduweb.fr
@@ -64,10 +85,12 @@ jobs:
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
+
       - name: Configuration SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Déploiement sur le serveur distant
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@lesacteursduweb.fr "
