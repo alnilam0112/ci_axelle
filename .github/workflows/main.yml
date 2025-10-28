@@ -51,7 +51,7 @@ jobs:
         run: ls -la vendor/bin
 
       - name: Analyse PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
+        run: php vendor/bin/phpstan analyse --no-progress
 
 
   phpcsfixer:
