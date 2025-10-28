@@ -22,7 +22,7 @@ jobs:
       - name: Installation des dépendances
         run: composer install --no-progress --no-suggest --no-interaction
       - name: Lancement des tests PHPUnit
-        run: vendor/bin/phpunit --testdox
+        run: composer exec phpunit -- --testdox
 
   phpstan:
     name: PHPStan
@@ -38,7 +38,7 @@ jobs:
       - name: Installation des dépendances
         run: composer install --no-progress --no-suggest --no-interaction
       - name: Analyse PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
+        run: composer exec phpstan -- analyse --no-progress
 
   phpcsfixer:
     name: PHP CS Fixer
@@ -54,7 +54,7 @@ jobs:
       - name: Installation des dépendances
         run: composer install --no-progress --no-suggest --no-interaction
       - name: Vérification du style de code
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+        run: composer exec php-cs-fixer -- fix --dry-run --diff
 
   deploy:
     name: Déploiement sur lesacteursduweb.fr
