@@ -14,31 +14,52 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Installation des dépendances et tests
-      - name: Install dependencies & run tests
-        run: |
-          echo "🔹 Installing dependencies"
+      # 2️⃣ Installer PHP et extensions
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo, xml, curl, zip
 
-          # Vérifie si package-lock.json existe
+      # 3️⃣ Installer les dépendances PHP via Composer
+      - name: Install PHP dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      # 4️⃣ Corriger les permissions sur les outils
+      - name: Fix permissions
+        run: |
+          chmod +x ./vendor/bin/phpunit
+          chmod +x ./vendor/bin/phpstan
+          chmod +x ./vendor/bin/php-cs-fixer
+
+      # 5️⃣ Lancer les tests unitaires avec PHPUnit
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
+
+      # 6️⃣ Analyse statique avec PHPStan
+      - name: Run PHPStan analysis
+        run: vendor/bin/phpstan analyse
+
+      # 7️⃣ Vérifier le style de code avec PHP CS Fixer
+      - name: Run PHP CS Fixer
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      # 8️⃣ Installer les dépendances Node.js si présentes
+      - name: Install Node.js dependencies
+        run: |
           if [ -f package-lock.json ]; then
-            echo "📦 package-lock.json trouvé, utilisation de npm ci"
             npm ci
           else
-            echo "⚠ package-lock.json manquant, utilisation de npm install"
             npm install
           fi
 
-          echo "🔹 Running tests"
-          npm test
-
-      # 3️⃣ Vérification du lint / syntaxe
-      - name: Lint & syntax check
+      # 9️⃣ Lancer les tests et lint JS
+      - name: Run JS tests & lint
         run: |
-          echo "🔹 Running linter"
+          npm test
           npm run lint
-          # Pour PHP: php -l fichier.php
 
-      # 4️⃣ Vérification des fichiers critiques
+      # 🔹 Vérifier les fichiers critiques
       - name: Check critical files
         run: |
           if [ ! -f ./config/.env ]; then
@@ -46,38 +67,7 @@ jobs:
             exit 1
           fi
 
-      # 5️⃣ Vérification de la branche
+      # 🔹 Vérifier la branche
       - name: Ensure branch is main
-        run: |
-          if [ "${GITHUB_REF##*/}" != "main" ]; then
-            echo "❌ Déploiement autorisé uniquement depuis main"
-            exit 1
-          fi
+        run:
 
-      # 6️⃣ Setup SSH
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # 7️⃣ Test de connexion SSH
-      - name: Test SSH connection
-        run: |
-          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "echo '✔ SSH works!'"
-
-      # 8️⃣ Déploiement via rsync
-      - name: Deploy files via rsync
-        run: |
-          rsync -avz --delete --exclude='.git' ./ axelle@lesacteursduweb.fr:/var/www/mon_site/
-
-      # 9️⃣ Commandes à distance (optionnel)
-      - name: Run remote commands
-        run: |
-          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
-          cd /var/www/mon_site &&
-          # Installer dépendances si nécessaire
-          # npm install
-          # Redémarrer le serveur web
-          sudo systemctl restart apache2
-          echo '✔ Deployment finished!'
-          "
