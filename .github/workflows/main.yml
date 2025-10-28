@@ -74,7 +74,7 @@ jobs:
         run: ls -la vendor/bin
 
       - name: Vérification du style de code
-        run: php vendor/bin/php-cs-fixer fix --dry-run --diff
+        run: php vendor/bin/php-cs-fixer fix --dry-run --diff --allow-risky=yes
 
 
   deploy:
