@@ -1,5 +1,8 @@
 <?php
-namespace App; 
+
+declare(strict_types=1);
+
+namespace App;
 
 class Math
 {
@@ -25,8 +28,9 @@ class Math
     public function division(float $a, float $b): float
     {
         if ($b == 0.0) {
-            throw new \InvalidArgumentException("Division par zéro impossible.");
+            throw new \InvalidArgumentException('Division par zéro impossible.');
         }
+
         return $a / $b;
     }
 }
