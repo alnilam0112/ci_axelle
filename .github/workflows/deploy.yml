@@ -27,15 +27,22 @@ jobs:
       - name: Deploy files via rsync
         run: |
           rsync -avz --delete --exclude='.git' ./ axelle@lesacteursduweb.fr:/var/www/mon_site/
-
-      - name: Run remote commands
+  deploy:
+    name: Déploiement sur lesacteursduweb.fr
+    runs-on: ubuntu-latest
+    needs: [phpunit, phpstan, phpcsfixer]
+    if: ${{ success() }}
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+      - name: Configuration SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Déploiement sur le serveur distant
         run: |
-          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
-          cd /var/www/mon_site &&
-          # par exemple, installer les dépendances si c'est un projet PHP ou Node
-          # composer install
-          # npm install && npm run build
-          # puis redémarrer le service web
-          sudo systemctl restart apache2
-          echo '✔ Deployment finished!'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@lesacteursduweb.fr "
+            cd ~/www_github &&
+            git pull origin main &&
+            composer install --no-dev --no-interaction --prefer-dist
           "
