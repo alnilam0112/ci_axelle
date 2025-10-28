@@ -23,3 +23,19 @@ jobs:
           ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
           echo '✔ yes!!'
           "
+
+      - name: Deploy files via rsync
+        run: |
+          rsync -avz --delete --exclude='.git' ./ axelle@lesacteursduweb.fr:/var/www/mon_site/
+
+      - name: Run remote commands
+        run: |
+          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
+          cd /var/www/mon_site &&
+          # par exemple, installer les dépendances si c'est un projet PHP ou Node
+          # composer install
+          # npm install && npm run build
+          # puis redémarrer le service web
+          sudo systemctl restart apache2
+          echo '✔ Deployment finished!'
+          "
