@@ -10,32 +10,67 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Récupération du code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Installation des dépendances et tests
+      - name: Install dependencies & run tests
+        run: |
+          echo "🔹 Installing dependencies"
+          # Exemple Node.js
+          npm ci
+          
+          echo "🔹 Running tests"
+          npm test
+          
+      # 3️⃣ Vérification du lint / syntaxe
+      - name: Lint & syntax check
+        run: |
+          echo "🔹 Running linter"
+          npm run lint
+          # Pour PHP: php -l fichier.php
+
+      # 4️⃣ Vérification des fichiers critiques
+      - name: Check critical files
+        run: |
+          if [ ! -f ./config/.env ]; then
+            echo "❌ Fichier .env manquant, arrêt du déploiement"
+            exit 1
+          fi
+
+      # 5️⃣ Vérification de la branche
+      - name: Ensure branch is main
+        run: |
+          if [ "${GITHUB_REF##*/}" != "main" ]; then
+            echo "❌ Déploiement autorisé uniquement depuis main"
+            exit 1
+          fi
+
+      # 6️⃣ Setup SSH
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Test ssh
+      # 7️⃣ Test de connexion SSH
+      - name: Test SSH connection
         run: |
-          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
-          echo '✔ yes!!'
-          "
+          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "echo '✔ SSH works!'"
 
+      # 8️⃣ Déploiement via rsync
       - name: Deploy files via rsync
         run: |
           rsync -avz --delete --exclude='.git' ./ axelle@lesacteursduweb.fr:/var/www/mon_site/
 
+      # 9️⃣ Commandes à distance (optionnel)
       - name: Run remote commands
         run: |
           ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
           cd /var/www/mon_site &&
-          # par exemple, installer les dépendances si c'est un projet PHP ou Node
-          # composer install
-          # npm install && npm run build
-          # puis redémarrer le service web
+          # Installer dépendances si nécessaire
+          # npm install
+          # Redémarrer le serveur web
           sudo systemctl restart apache2
           echo '✔ Deployment finished!'
           "
