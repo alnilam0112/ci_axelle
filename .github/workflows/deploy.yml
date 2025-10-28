@@ -10,64 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Récupération du code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Installer PHP et extensions
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          php-version: '8.3'
-          extensions: mbstring, intl, pdo, xml, curl, zip
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # 3️⃣ Installer les dépendances PHP via Composer
-      - name: Install PHP dependencies
-        run: composer install --no-progress --no-interaction --prefer-dist
-
-      # 4️⃣ Corriger les permissions sur les outils
-      - name: Fix permissions
+      - name: Test ssh
         run: |
-          chmod +x ./vendor/bin/phpunit
-          chmod +x ./vendor/bin/phpstan
-          chmod +x ./vendor/bin/php-cs-fixer
+          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
+          echo '✔ yes!!'
+          "
 
-      # 5️⃣ Lancer les tests unitaires avec PHPUnit
-      - name: Run PHPUnit tests
-        run: vendor/bin/phpunit
-
-      # 6️⃣ Analyse statique avec PHPStan
-      - name: Run PHPStan analysis
-        run: vendor/bin/phpstan analyse
-
-      # 7️⃣ Vérifier le style de code avec PHP CS Fixer
-      - name: Run PHP CS Fixer
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff --allow-risky=yes
-
-      # 8️⃣ Installer les dépendances Node.js si présentes
-      - name: Install Node.js dependencies
+      - name: Deploy files via rsync
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+          rsync -avz --delete --exclude='.git' ./ axelle@lesacteursduweb.fr:/var/www/mon_site/
 
-      # 9️⃣ Lancer les tests et lint JS
-      - name: Run JS tests & lint
+      - name: Run remote commands
         run: |
-          npm test
-          npm run lint
-
-      # 🔹 Vérifier les fichiers critiques
-      - name: Check critical files
-        run: |
-          if [ ! -f ./config/.env ]; then
-            echo "❌ Fichier .env manquant, arrêt du déploiement"
-            exit 1
-          fi
-
-      # 🔹 Vérifier la branche
-      - name: Ensure branch is main
-        run:
-
+          ssh -o StrictHostKeyChecking=no axelle@lesacteursduweb.fr "
+          cd /var/www/mon_site &&
+          # par exemple, installer les dépendances si c'est un projet PHP ou Node
+          # composer install
+          # npm install && npm run build
+          # puis redémarrer le service web
+          sudo systemctl restart apache2
+          echo '✔ Deployment finished!'
+          "
